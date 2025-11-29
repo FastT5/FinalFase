@@ -27,3 +27,20 @@
 .hero-section h1 {
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
+/* css/style.css - Agrega esto al final */
+
+/* Efecto Hover para tarjetas de servicios */
+.hover-effect {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.hover-effect:hover {
+    transform: translateY(-10px); /* Mueve la tarjeta hacia arriba */
+    box-shadow: 0 1rem 3rem rgba(0,0,0,0.175) !important; /* Aumenta la sombra */
+}
+
+/* Ajuste para que las imágenes no se deformen */
+.object-fit-cover {
+    object-fit: cover;
+}
