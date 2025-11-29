@@ -1,0 +1,29 @@
+/* css/styles.css */
+
+:root {
+    --primary-blue: #4da3ff; /* Un azul similar al de tus bosquejos */
+}
+
+/* Ajustes de la barra de navegación */
+.bg-primary {
+    background-color: var(--primary-blue) !important;
+}
+
+.nav-link {
+    font-weight: 500;
+    text-transform: uppercase;
+    margin-right: 15px;
+}
+
+/* Hero Section (La parte visual principal de la Pantalla 1) */
+.hero-section {
+    /* Aquí debes poner una foto real de fondo en tu carpeta img */
+    background: linear-gradient(rgba(77, 163, 255, 0.7), rgba(0, 0, 0, 0.5)), url('../img/consultorio-fondo.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 85vh; /* Ocupa el 85% de la altura de la pantalla */
+}
+
+.hero-section h1 {
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
