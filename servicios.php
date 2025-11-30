@@ -1,4 +1,4 @@
-<?php if (session_status() === PHP_SESSION_NONE) session_start(); ?>
+<?php if (session_status() === PHP_SESSION_NONE) session_start(); include 'conexion.php'; ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -32,8 +32,14 @@
                             <button class="btn btn-light text-primary fw-bold dropdown-toggle" type="button" data-bs-toggle="dropdown">
                                 <?php echo $_SESSION['nombre']; ?>
                             </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="logout.php">Cerrar Sesión</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <?php if ($_SESSION['rol'] == 3): ?>
+                                    <li><a class="dropdown-item" href="mis_citas.php">Mis Citas</a></li>
+                                <?php elseif ($_SESSION['rol'] == 2): ?>
+                                    <li><a class="dropdown-item" href="panel_doctor.php">Panel Médico</a></li>
+                                <?php endif; ?>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="logout.php">Cerrar Sesión</a></li>
                             </ul>
                         </div>
                     <?php else: ?>
@@ -47,42 +53,53 @@
     <div class="container py-5">
         <div class="text-center mb-5">
             <h2 class="fw-bold display-5">Nuestros Servicios</h2>
+            <p class="text-muted">Tratamientos profesionales a tu alcance</p>
         </div>
+
         <div class="row row-cols-1 row-cols-md-3 g-4">
-            <div class="col">
-                <div class="card h-100 border-0 shadow-sm hover-effect">
-                    <img src="img/general.jpg" class="card-img-top" style="height: 250px; object-fit: cover;">
-                    <div class="card-body text-center">
-                        <h5 class="card-title fw-bold">Odontología General</h5>
-                        <p>Limpiezas, Revisiones, Empastes.</p>
-                        <a href="contacto.php" class="btn btn-primary rounded-pill w-75 fw-bold">SOLICITAR CITA</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card h-100 border-0 shadow-sm hover-effect">
-                    <img src="img/especialidades.jpg" class="card-img-top" style="height: 250px; object-fit: cover;">
-                    <div class="card-body text-center">
-                        <h5 class="card-title fw-bold">Especialidades</h5>
-                        <p>Endodoncia, Ortodoncia, Periodoncia.</p>
-                        <a href="contacto.php" class="btn btn-primary rounded-pill w-75 fw-bold">SOLICITAR CITA</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card h-100 border-0 shadow-sm hover-effect">
-                    <img src="img/estetica.jpg" class="card-img-top" style="height: 250px; object-fit: cover;">
-                    <div class="card-body text-center">
-                        <h5 class="card-title fw-bold">Estética</h5>
-                        <p>Blanqueamiento, Carillas, Diseño.</p>
-                        <a href="contacto.php" class="btn btn-primary rounded-pill w-75 fw-bold">SOLICITAR CITA</a>
-                    </div>
-                </div>
-            </div>
+            <?php
+            // Solo mostramos servicios habilitados
+            $sql = "SELECT * FROM Servicios WHERE Estatus = 'Habilitada'";
+            $result = $conn->query($sql);
+
+            if ($result && $result->num_rows > 0) {
+                while($row = $result->fetch_assoc()) {
+                    
+                    // --- LÓGICA DE IMAGEN MEJORADA ---
+                    // 1. Intentamos usar la foto subida por el admin
+                    if (!empty($row['Foto'])) {
+                        $img = "img/" . $row['Foto'];
+                    } else {
+                        // 2. Si no hay foto subida, usamos una por defecto según el tipo
+                        $img = "img/general.jpg";
+                        if ($row['TipoServicio'] == 'Odontología Estética') $img = "img/estetica.jpg";
+                        if ($row['TipoServicio'] == 'Especialidades') $img = "img/especialidades.jpg";
+                    }
+                    
+                    echo '
+                    <div class="col">
+                        <div class="card h-100 border-0 shadow-sm hover-effect">
+                            <img src="'.$img.'" class="card-img-top" style="height:250px; object-fit:cover;">
+                            <div class="card-body text-center d-flex flex-column">
+                                <h5 class="card-title fw-bold text-uppercase">'.$row['NombreServicio'].'</h5>
+                                <h4 class="text-primary fw-bold mb-3">$'.$row['Costo'].'</h4>
+                                <p class="small text-muted flex-grow-1">'.$row['Descripcion'].'</p>
+                                
+                                <a href="solicitar_cita.php?servicio_id='.$row['ID'].'" class="btn btn-primary rounded-pill w-100 fw-bold mt-3">SOLICITAR CITA</a>
+                            </div>
+                        </div>
+                    </div>';
+                }
+            } else {
+                echo "<p class='text-center w-100'>No hay servicios disponibles por el momento.</p>";
+            }
+            ?>
         </div>
     </div>
 
-    <footer class="bg-dark text-white text-center py-3 mt-5"><p>&copy; 2025 DentaLife</p></footer>
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <p>&copy; 2025 DentaLife</p>
+    </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

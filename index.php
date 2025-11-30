@@ -31,10 +31,15 @@
                     <?php if (isset($_SESSION['nombre'])): ?>
                         <div class="dropdown">
                             <button class="btn btn-light text-primary fw-bold dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <?php echo $_SESSION['nombre']; ?>
+                                <i class="bi bi-person-circle"></i> <?php echo $_SESSION['nombre']; ?>
                             </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="logout.php">Cerrar Sesión</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <?php if ($_SESSION['rol'] == 3): // Solo para Pacientes ?>
+                                    <li><a class="dropdown-item" href="mis_citas.php"><i class="bi bi-calendar-check"></i> Mis Citas</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                <?php endif; ?>
+
+                                <li><a class="dropdown-item text-danger" href="logout.php">Cerrar Sesión</a></li>
                             </ul>
                         </div>
                     <?php else: ?>
