@@ -13,16 +13,14 @@ $id_paciente = $_SESSION['usuario_id'];
 // 2. Lógica para CANCELAR
 if (isset($_POST['cancelar_solicitud'])) {
     $id_sol = $_POST['id_solicitud'];
-    // Marcamos como cancelada por el usuario
     $conn->query("UPDATE Solicitudes SET Estatus = 'Cancelada' WHERE ID = $id_sol");
-    echo "<script>alert('Solicitud cancelada.'); window.location.href='mis_citas.php';</script>";
+    header("Location: mis_citas.php");
 }
 
 if (isset($_POST['cancelar_cita'])) {
     $id_cita = $_POST['id_cita'];
-    // Marcamos la cita real como cancelada
     $conn->query("UPDATE Citas SET EstatusCita = 'Cancelada' WHERE ID = $id_cita");
-    echo "<script>alert('Cita cancelada exitosamente.'); window.location.href='mis_citas.php';</script>";
+    header("Location: mis_citas.php");
 }
 ?>
 
@@ -58,31 +56,32 @@ if (isset($_POST['cancelar_cita'])) {
                         <i class="bi bi-hourglass-split"></i> En Lista de Espera
                     </div>
                     <div class="card-body">
-                        <p class="small text-muted">Estas solicitudes están esperando confirmación del doctor.</p>
+                        <p class="small text-muted">Solicitudes enviadas esperando confirmación.</p>
                         
                         <?php
-                        $sql_sol = "SELECT Solicitudes.*, Servicios.NombreServicio 
+                        // Traemos Solicitudes Pendientes + Nombre de Sucursal
+                        $sql_sol = "SELECT Solicitudes.*, Servicios.NombreServicio, Sucursales.NombreSucursal 
                                     FROM Solicitudes 
                                     JOIN Servicios ON Solicitudes.ServicioID = Servicios.ID
+                                    JOIN Sucursales ON Solicitudes.SucursalID = Sucursales.ID
                                     WHERE PacienteID = $id_paciente AND Solicitudes.Estatus = 'Pendiente'
                                     ORDER BY FechaSolicitada ASC";
                         $res_sol = $conn->query($sql_sol);
 
-                        if ($res_sol->num_rows > 0) {
+                        if ($res_sol && $res_sol->num_rows > 0) {
                             while($row = $res_sol->fetch_assoc()) {
                                 $fecha = date('d/M/Y h:i A', strtotime($row['FechaSolicitada']));
                                 echo '
-                                <div class="alert alert-warning d-flex justify-content-between align-items-center">
-                                    <div>
+                                <div class="alert alert-warning">
+                                    <div class="d-flex justify-content-between">
                                         <h6 class="fw-bold mb-1">'.$row['NombreServicio'].'</h6>
-                                        <small><i class="bi bi-clock"></i> Solicitada para: '.$fecha.'</small>
+                                        <form method="POST">
+                                            <input type="hidden" name="id_solicitud" value="'.$row['ID'].'">
+                                            <button type="submit" name="cancelar_solicitud" class="btn btn-sm text-danger border-0 p-0" title="Cancelar Solicitud" onclick="return confirm(\'¿Cancelar?\')"><i class="bi bi-x-lg"></i></button>
+                                        </form>
                                     </div>
-                                    <form method="POST">
-                                        <input type="hidden" name="id_solicitud" value="'.$row['ID'].'">
-                                        <button type="submit" name="cancelar_solicitud" class="btn btn-sm btn-outline-danger" onclick="return confirm(\'¿Ya no quieres esta cita?\')">
-                                            <i class="bi bi-x-lg"></i> Cancelar
-                                        </button>
-                                    </form>
+                                    <small class="d-block"><i class="bi bi-clock"></i> '.$fecha.'</small>
+                                    <small class="d-block text-muted"><i class="bi bi-geo-alt"></i> '.$row['NombreSucursal'].'</small>
                                 </div>';
                             }
                         } else {
@@ -96,32 +95,37 @@ if (isset($_POST['cancelar_cita'])) {
             <div class="col-lg-6 mb-4">
                 <div class="card shadow border-0 h-100">
                     <div class="card-header bg-success text-white fw-bold">
-                        <i class="bi bi-check-circle"></i> Citas Confirmadas
+                        <i class="bi bi-check-circle"></i> Agenda Confirmada
                     </div>
                     <div class="card-body">
                         <p class="small text-muted">¡Ya tienes fecha! Por favor asiste puntual.</p>
 
                         <?php
-                        $sql_citas = "SELECT Citas.*, Servicios.NombreServicio, Usuarios.Nombre as Doctor
+                        // CORRECCIÓN AQUÍ: Mostrar tanto 'Pendiente' como 'Confirmada'
+                        $sql_citas = "SELECT Citas.*, Servicios.NombreServicio, Usuarios.Nombre as Doctor, Sucursales.NombreSucursal
                                       FROM Citas 
                                       JOIN Servicios ON Citas.ServicioID = Servicios.ID
                                       JOIN Usuarios ON Citas.EmpleadoID = Usuarios.ID
-                                      WHERE PacienteID = $id_paciente AND EstatusCita = 'Pendiente'
+                                      JOIN Sucursales ON Citas.SucursalID = Sucursales.ID
+                                      WHERE PacienteID = $id_paciente 
+                                      AND (EstatusCita = 'Pendiente' OR EstatusCita = 'Confirmada')
                                       ORDER BY FechaHora ASC";
+                        
                         $res_citas = $conn->query($sql_citas);
 
-                        if ($res_citas->num_rows > 0) {
+                        if ($res_citas && $res_citas->num_rows > 0) {
                             while($cita = $res_citas->fetch_assoc()) {
                                 $fecha = date('d/M/Y h:i A', strtotime($cita['FechaHora']));
                                 echo '
-                                <div class="card mb-3 border-success">
+                                <div class="card mb-3 border-success shadow-sm">
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between">
                                             <h5 class="card-title text-success fw-bold">'.$cita['NombreServicio'].'</h5>
                                             <span class="badge bg-success">Confirmada</span>
                                         </div>
                                         <p class="card-text mb-1"><i class="bi bi-calendar-event"></i> <strong>'.$fecha.'</strong></p>
-                                        <p class="card-text mb-2"><i class="bi bi-person-badge"></i> Atiende: Dr. '.$cita['Doctor'].'</p>
+                                        <p class="card-text mb-1 small"><i class="bi bi-geo-alt-fill"></i> '.$cita['NombreSucursal'].'</p>
+                                        <p class="card-text mb-2 small text-muted"><i class="bi bi-person-badge"></i> Dr. '.$cita['Doctor'].'</p>
                                         
                                         <form method="POST" class="text-end">
                                             <input type="hidden" name="id_cita" value="'.$cita['ID'].'">
@@ -133,7 +137,7 @@ if (isset($_POST['cancelar_cita'])) {
                                 </div>';
                             }
                         } else {
-                            echo '<div class="text-center text-muted py-3">No tienes citas programadas. <br><a href="servicios.php">¡Agenda una aquí!</a></div>';
+                            echo '<div class="text-center text-muted py-3">No tienes citas programadas. <br><a href="servicios.php" class="fw-bold text-success">¡Agenda una aquí!</a></div>';
                         }
                         ?>
                     </div>
@@ -153,16 +157,20 @@ if (isset($_POST['cancelar_cita'])) {
                                      UNION
                                      SELECT Solicitudes.FechaSolicitada, Solicitudes.Estatus, Servicios.NombreServicio
                                      FROM Solicitudes JOIN Servicios ON Solicitudes.ServicioID = Servicios.ID
-                                     WHERE PacienteID = $id_paciente AND Solicitudes.Estatus = 'Cancelada'
+                                     WHERE PacienteID = $id_paciente AND (Solicitudes.Estatus = 'Cancelada' OR Solicitudes.Estatus = 'Rechazada')
                                      ORDER BY 1 DESC LIMIT 5";
                         $res_hist = $conn->query($sql_hist);
                         
-                        while($hist = $res_hist->fetch_assoc()) {
-                            echo "<tr>
-                                <td>".date('d/m/Y', strtotime($hist['FechaHora']))."</td>
-                                <td>".$hist['NombreServicio']."</td>
-                                <td>".$hist['EstatusCita']."</td>
-                            </tr>";
+                        if($res_hist && $res_hist->num_rows > 0) {
+                            while($hist = $res_hist->fetch_assoc()) {
+                                echo "<tr>
+                                    <td>".date('d/m/Y', strtotime($hist['FechaHora']))."</td>
+                                    <td>".$hist['NombreServicio']."</td>
+                                    <td>".$hist['EstatusCita']."</td>
+                                </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='3'>Historial vacío.</td></tr>";
                         }
                         ?>
                     </tbody>
