@@ -1,3 +1,4 @@
+<?php if (session_status() === PHP_SESSION_NONE) session_start(); ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,20 +12,36 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="index.html">DENTALIFE 🦷</a>
+            <a class="navbar-brand fw-bold" href="index.php">DENTALIFE 🦷</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.html">HOME</a></li>
-                    <li class="nav-item"><a class="nav-link" href="servicios.html">SERVICIOS</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="galeria.html">GALERÍA</a></li>
-                    <li class="nav-item"><a class="nav-link" href="sobrenos.html">SOBRE NOSOTROS</a></li>
-                    <li class="nav-item"><a class="nav-link" href="contacto.html">CONTÁCTANOS</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.php">HOME</a></li>
+                    <li class="nav-item"><a class="nav-link" href="servicios.php">SERVICIOS</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="galeria.php">GALERÍA</a></li>
+                    <li class="nav-item"><a class="nav-link" href="sobrenos.php">SOBRE NOSOTROS</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contacto.php">CONTÁCTANOS</a></li>
+                    
+                    <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] == 1): ?>
+                        <li class="nav-item"><a class="nav-link text-warning fw-bold" href="admin.php">ADMIN</a></li>
+                    <?php endif; ?>
                 </ul>
+
                 <div class="ms-3">
-                    <a href="login.html" class="btn btn-light text-primary fw-bold">Login <i class="bi bi-person-circle"></i></a>
+                    <?php if (isset($_SESSION['nombre'])): ?>
+                        <div class="dropdown">
+                            <button class="btn btn-light text-primary fw-bold dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle"></i> <?php echo $_SESSION['nombre']; ?>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item text-danger" href="logout.php">Cerrar Sesión</a></li>
+                            </ul>
+                        </div>
+                    <?php else: ?>
+                        <a href="login.php" class="btn btn-light text-primary fw-bold">Login <i class="bi bi-person-circle"></i></a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

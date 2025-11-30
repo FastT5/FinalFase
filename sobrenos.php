@@ -1,3 +1,4 @@
+<?php if (session_status() === PHP_SESSION_NONE) session_start(); ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,20 +12,36 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="index.html">DENTALIFE 🦷</a>
+            <a class="navbar-brand fw-bold" href="index.php">DENTALIFE 🦷</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.html">HOME</a></li>
-                    <li class="nav-item"><a class="nav-link" href="servicios.html">SERVICIOS</a></li>
-                    <li class="nav-item"><a class="nav-link" href="galeria.html">GALERÍA</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="sobrenos.html">SOBRE NOSOTROS</a></li>
-                    <li class="nav-item"><a class="nav-link" href="contacto.html">CONTÁCTANOS</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.php">HOME</a></li>
+                    <li class="nav-item"><a class="nav-link" href="servicios.php">SERVICIOS</a></li>
+                    <li class="nav-item"><a class="nav-link" href="galeria.php">GALERÍA</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="sobrenos.php">SOBRE NOSOTROS</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contacto.php">CONTÁCTANOS</a></li>
+                    
+                    <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] == 1): ?>
+                        <li class="nav-item"><a class="nav-link text-warning fw-bold" href="admin.php">ADMIN</a></li>
+                    <?php endif; ?>
                 </ul>
+
                 <div class="ms-3">
-                    <a href="login.html" class="btn btn-light text-primary fw-bold">Login <i class="bi bi-person-circle"></i></a>
+                    <?php if (isset($_SESSION['nombre'])): ?>
+                        <div class="dropdown">
+                            <button class="btn btn-light text-primary fw-bold dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle"></i> <?php echo $_SESSION['nombre']; ?>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item text-danger" href="logout.php">Cerrar Sesión</a></li>
+                            </ul>
+                        </div>
+                    <?php else: ?>
+                        <a href="login.php" class="btn btn-light text-primary fw-bold">Login <i class="bi bi-person-circle"></i></a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -38,11 +55,13 @@
                         <i class="bi bi-hourglass-split fs-2 text-primary"></i>
                     </div>
                     <h3 class="fw-bold">Historia</h3>
-                    <p class="small text-muted text-start">La clínica nació en el año 1970 con la visión de transformar la salud dental en nuestra comunidad. 
-            Lo que comenzó como un pequeño consultorio familiar, fundado por el Dr. abuelo Mendoza, ha evolucionado 
-            hasta convertirse en un centro de especialidades odontológicas de vanguardia. A lo largo de más de 50 años, 
-            hemos incorporado tecnología digital y las técnicas más avanzadas, manteniendo siempre el trato humano y 
-            cercano que nos caracteriza desde el primer día.</p>
+                    <p class="small text-muted text-start">
+                        La clínica nació en el año 1970 con la visión de transformar la salud dental en nuestra comunidad. 
+                        Lo que comenzó como un pequeño consultorio familiar, fundado por el Dr. abuelo Mendoza, ha evolucionado 
+                        hasta convertirse en un centro de especialidades odontológicas de vanguardia. A lo largo de más de 50 años, 
+                        hemos incorporado tecnología digital y las técnicas más avanzadas, manteniendo siempre el trato humano y 
+                        cercano que nos caracteriza desde el primer día.
+                    </p>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
@@ -51,7 +70,7 @@
                         <i class="bi bi-lightbulb fs-2 text-primary"></i>
                     </div>
                     <h3 class="fw-bold">Misión</h3>
-                    <p class="small text-start">Nuestra misión es ofrecer servicios odontológicos de la más alta calidad...</p>
+                    <p class="small text-start">Nuestra misión es ofrecer servicios odontológicos de la más alta calidad, con un equipo profesional y tecnología de punta.</p>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
@@ -60,7 +79,7 @@
                         <i class="bi bi-eye fs-2 text-primary"></i>
                     </div>
                     <h3 class="fw-bold">Visión</h3>
-                    <p class="small text-muted text-start">Ser la clínica dental líder en la región, reconocida por nuestra excelencia...</p>
+                    <p class="small text-muted text-start">Ser la clínica dental líder en la región, reconocida por nuestra excelencia y trato humano.</p>
                 </div>
             </div>
         </div>
