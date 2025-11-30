@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 30-11-2025 a las 07:04:17
+-- Tiempo de generación: 30-11-2025 a las 19:55:36
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -38,13 +38,6 @@ CREATE TABLE `citas` (
   `SucursalID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `citas`
---
-
-INSERT INTO `citas` (`ID`, `FechaHora`, `EstatusCita`, `MontoPagado`, `PacienteID`, `EmpleadoID`, `ServicioID`, `SucursalID`) VALUES
-(1, '2025-10-21 10:00:00', 'Completada', 500.00, 3, 2, 1, 1);
-
 -- --------------------------------------------------------
 
 --
@@ -55,13 +48,6 @@ CREATE TABLE `empleadosucursal` (
   `EmpleadoID` int(11) DEFAULT NULL,
   `SucursalID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `empleadosucursal`
---
-
-INSERT INTO `empleadosucursal` (`EmpleadoID`, `SucursalID`) VALUES
-(2, 1);
 
 -- --------------------------------------------------------
 
@@ -119,13 +105,6 @@ CREATE TABLE `resenas` (
   `PacienteID` int(11) DEFAULT NULL,
   `CitaID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `resenas`
---
-
-INSERT INTO `resenas` (`ID`, `Comentario`, `FechaResena`, `EsVisible`, `PacienteID`, `CitaID`) VALUES
-(1, 'Excelente servicio, no me dolió nada la limpieza.', '2025-10-22', 1, 3, 1);
 
 -- --------------------------------------------------------
 
@@ -186,15 +165,9 @@ CREATE TABLE `solicitudes` (
   `TelefonoContacto` varchar(20) NOT NULL,
   `FechaSolicitada` datetime NOT NULL,
   `Estatus` varchar(20) DEFAULT 'Pendiente',
-  `FechaSolicitud` datetime DEFAULT current_timestamp()
+  `FechaSolicitud` datetime DEFAULT current_timestamp(),
+  `SucursalID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `solicitudes`
---
-
-INSERT INTO `solicitudes` (`ID`, `PacienteID`, `ServicioID`, `TelefonoContacto`, `FechaSolicitada`, `Estatus`, `FechaSolicitud`) VALUES
-(1, 4, 1, '82811111111', '2025-12-03 08:14:00', 'Pendiente', '2025-11-29 18:12:29');
 
 -- --------------------------------------------------------
 
@@ -214,9 +187,8 @@ CREATE TABLE `sucursales` (
 --
 
 INSERT INTO `sucursales` (`ID`, `NombreSucursal`, `Direccion`, `TelefonoSucursal`) VALUES
-(1, 'Sucursal San Nicolás', 'Av. Universidad #123, Col. Anáhuac', '811-123-4567'),
-(2, 'Sucursal Apodaca', 'Av. Concordia #800, Plaza Sendero', '811-987-6543'),
-(3, 'Sucursal Guadalupe', 'Av. Benito Juárez #400, Centro', '811-555-9999');
+(1, 'Sucursal Cadereyta', 'Gonzalitos 100 Oriente, entre Mutualismo y 20 de Noviembre, 67480 Cadereyta Jiménez, N.L.', '828-284-0000'),
+(2, 'Sucursal San Nicolás', 'S. Cristóbal, Villas de San Cristobal 2do Sector, 66478 San Nicolás de los Garza, N.L.', '811-123-4567');
 
 -- --------------------------------------------------------
 
@@ -330,7 +302,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `citas`
 --
 ALTER TABLE `citas`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `galeria`
@@ -342,7 +314,7 @@ ALTER TABLE `galeria`
 -- AUTO_INCREMENT de la tabla `resenas`
 --
 ALTER TABLE `resenas`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `roles`
@@ -360,13 +332,13 @@ ALTER TABLE `servicios`
 -- AUTO_INCREMENT de la tabla `solicitudes`
 --
 ALTER TABLE `solicitudes`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `sucursales`
 --
 ALTER TABLE `sucursales`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`

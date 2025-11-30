@@ -11,17 +11,18 @@ $servicio_preseleccionado = isset($_GET['servicio_id']) ? $_GET['servicio_id'] :
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $paciente_id = $_SESSION['usuario_id'];
     $servicio_id = $_POST['servicio'];
+    $sucursal_id = $_POST['sucursal']; // <--- NUEVO CAMPO
     $telefono = $_POST['telefono'];
-    $fecha = $_POST['fecha']; // Ahora recibimos fecha y hora exacta
+    $fecha = $_POST['fecha'];
 
-    // Insertamos la FECHA EXACTA que pidió el paciente
-    $sql = "INSERT INTO Solicitudes (PacienteID, ServicioID, TelefonoContacto, FechaSolicitada) 
-            VALUES ('$paciente_id', '$servicio_id', '$telefono', '$fecha')";
+    // Insertamos también la SUCURSAL
+    $sql = "INSERT INTO Solicitudes (PacienteID, ServicioID, SucursalID, TelefonoContacto, FechaSolicitada) 
+            VALUES ('$paciente_id', '$servicio_id', '$sucursal_id', '$telefono', '$fecha')";
     
     if ($conn->query($sql)) {
-        echo "<script>alert('¡Solicitud enviada! El doctor revisará la fecha seleccionada y la confirmará.'); window.location.href='index.php';</script>";
+        echo "<script>alert('¡Solicitud enviada! Hemos registrado tu preferencia de sucursal y hora.'); window.location.href='index.php';</script>";
     } else {
-        echo "<script>alert('Error al enviar solicitud.');</script>";
+        echo "<script>alert('Error: " . $conn->error . "');</script>";
     }
 }
 ?>
@@ -47,7 +48,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="col-md-6">
                 <div class="card shadow p-4">
                     <h3 class="text-center mb-3 text-primary">Agenda tu Cita</h3>
-                    <p class="text-muted text-center small mb-4">Elige el día y la hora que prefieras.</p>
                     
                     <form method="POST">
                         
@@ -66,6 +66,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
 
                         <div class="mb-3">
+                            <label class="form-label fw-bold">Sucursal de Preferencia</label>
+                            <select name="sucursal" class="form-select" required>
+                                <option value="">Selecciona ubicación...</option>
+                                <?php
+                                $sucs = $conn->query("SELECT * FROM Sucursales");
+                                while($row = $sucs->fetch_assoc()) {
+                                    echo "<option value='".$row['ID']."'>".$row['NombreSucursal']."</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label fw-bold">Teléfono de Contacto</label>
                             <input type="tel" name="telefono" class="form-control" placeholder="Ej: 811 555 9999" required>
                         </div>
@@ -73,10 +86,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="mb-3">
                             <label class="form-label fw-bold">Fecha y Hora Deseada</label>
                             <input type="datetime-local" name="fecha" class="form-control" required min="<?php echo date('Y-m-d\TH:i'); ?>">
-                            <div class="form-text">Sujeto a confirmación por el doctor.</div>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2">SOLICITAR ESTA FECHA</button>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2">SOLICITAR CITA</button>
                     </form>
                 </div>
             </div>

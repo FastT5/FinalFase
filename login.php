@@ -5,29 +5,31 @@ include 'conexion.php';
 $mensaje = "";
 
 // ---------------------------------------------------------
-// LÓGICA DE LOGIN Y REGISTRO (PHP)
+// LÓGICA DE LOGIN Y REGISTRO
 // ---------------------------------------------------------
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
-    // --- REGISTRO ---
+    // --- REGISTRO (Crea Paciente - Rol 3) ---
     if (isset($_POST['accion']) && $_POST['accion'] == 'registro') {
         $nombre = $_POST['nuevo_usuario'];
         $email = $_POST['nuevo_email'];
         $pass = $_POST['nueva_password'];
-        $rol = 3; // Paciente por defecto
+        $rol = 3; // Rol de Paciente por defecto
 
-        // Validar correo
+        // 1. Validar si ya existe el correo
         $check = "SELECT * FROM Usuarios WHERE Correo = '$email'";
         $result = $conn->query($check);
 
         if ($result->num_rows > 0) {
-            $mensaje = "<div class='alert alert-danger'>El correo ya está registrado.</div>";
+            $mensaje = "<div class='alert alert-danger text-center'>Ese correo ya está registrado.</div>";
         } else {
+            // 2. Insertar nuevo usuario
             $sql = "INSERT INTO Usuarios (Nombre, Correo, Contrasena, RolID) VALUES ('$nombre', '$email', '$pass', $rol)";
+            
             if ($conn->query($sql) === TRUE) {
                 echo "<script>alert('¡Registro exitoso! Por favor inicia sesión.'); window.location.href='login.php';</script>";
             } else {
-                $mensaje = "<div class='alert alert-danger'>Error: " . $conn->error . "</div>";
+                $mensaje = "<div class='alert alert-danger text-center'>Error: " . $conn->error . "</div>";
             }
         }
     }
@@ -56,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             exit();
         } else {
-            $mensaje = "<div class='alert alert-danger'>Correo o contraseña incorrectos.</div>";
+            $mensaje = "<div class='alert alert-danger text-center'>Correo o contraseña incorrectos.</div>";
         }
     }
 }
@@ -71,7 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
-        body { background-color: #f8f9fa; }
+        body { background-color: #f0f2f5; } /* Fondo suave */
     </style>
 </head>
 <body>
@@ -89,66 +91,76 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <div class="container d-flex flex-column justify-content-center align-items-center" style="min-height: 85vh;">
         
-        <?php if($mensaje != "") echo $mensaje; ?>
+        <div class="w-100 d-flex justify-content-center">
+            <div class="col-md-6">
+                <?php if($mensaje != "") echo $mensaje; ?>
+            </div>
+        </div>
 
         <div class="row w-100 justify-content-center">
-            
-            <div class="col-md-8 col-lg-6 col-xl-5 shadow-lg rounded bg-white overflow-hidden p-0">
-                
-                <div class="p-5" id="loginForm">
-                    <div class="text-center mb-4">
-                        <h2 class="fw-bold text-primary">BIENVENIDO</h2>
-                        <p class="text-muted small">Ingresa a tu cuenta DentaLife</p>
-                    </div>
+            <div class="col-md-8 col-lg-5 col-xl-4">
+                <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
                     
-                    <form action="login.php" method="POST">
-                        <input type="hidden" name="accion" value="login">
-                        
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-secondary">Correo Electrónico</label>
-                            <input type="email" class="form-control form-control-lg bg-light fs-6" name="usuario" placeholder="ejemplo@correo.com" required>
+                    <div class="card-body p-5" id="loginForm">
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold text-primary">Bienvenido</h2>
+                            <p class="text-muted small">Ingresa a tu cuenta DentaLife</p>
                         </div>
                         
-                        <div class="mb-4">
-                            <label class="form-label fw-bold small text-secondary">Contraseña</label>
-                            <input type="password" class="form-control form-control-lg bg-light fs-6" name="password" placeholder="********" required>
-                        </div>
+                        <form action="login.php" method="POST">
+                            <input type="hidden" name="accion" value="login">
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-secondary">Correo Electrónico</label>
+                                <input type="email" class="form-control form-control-lg bg-light fs-6" name="usuario" placeholder="nombre@correo.com" required>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label fw-bold small text-secondary">Contraseña</label>
+                                <input type="password" class="form-control form-control-lg bg-light fs-6" name="password" placeholder="********" required>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100 btn-lg fw-bold mb-3 shadow-sm">ENTRAR</button>
+                        </form>
                         
-                        <button type="submit" class="btn btn-primary w-100 btn-lg fw-bold mb-3">ENTRAR</button>
-                    </form>
-                    
-                    <div class="text-center">
-                        <small class="text-muted">¿No tienes cuenta? <a href="#" onclick="mostrarRegistro()" class="text-primary fw-bold text-decoration-none">Crea una aquí</a></small>
+                        <div class="text-center mt-3">
+                            <p class="small text-muted mb-0">¿No tienes cuenta?</p>
+                            <a href="#" onclick="mostrarRegistro()" class="text-primary fw-bold text-decoration-none">Crear una cuenta nueva</a>
+                        </div>
                     </div>
+
+                    <div class="card-body p-5 bg-light" id="registroForm" style="display: none;">
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold text-success">Registrarse</h2>
+                            <p class="text-muted small">Únete a nuestra familia dental</p>
+                        </div>
+
+                        <form action="login.php" method="POST">
+                            <input type="hidden" name="accion" value="registro">
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-secondary">Nombre Completo</label>
+                                <input type="text" class="form-control" name="nuevo_usuario" placeholder="Ej. Juan Pérez" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-secondary">Correo Electrónico</label>
+                                <input type="email" class="form-control" name="nuevo_email" placeholder="nombre@correo.com" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold small text-secondary">Contraseña</label>
+                                <input type="password" class="form-control" name="nueva_password" placeholder="Crea una contraseña" required>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-success w-100 btn-lg fw-bold mb-3 shadow-sm">REGISTRARSE</button>
+                        </form>
+                        
+                        <div class="text-center mt-3">
+                            <p class="small text-muted mb-0">¿Ya tienes cuenta?</p>
+                            <a href="#" onclick="mostrarLogin()" class="text-success fw-bold text-decoration-none">Iniciar Sesión</a>
+                        </div>
+                    </div>
+
                 </div>
-
-                <div class="p-5 bg-light" id="registroForm" style="display: none;">
-                    <div class="text-center mb-4">
-                        <h2 class="fw-bold text-success">CREAR CUENTA</h2>
-                        <p class="text-muted small">Únete a nuestra comunidad</p>
-                    </div>
-
-                    <form action="login.php" method="POST">
-                        <input type="hidden" name="accion" value="registro">
-                        
-                        <div class="mb-3">
-                            <input type="text" class="form-control" name="nuevo_usuario" placeholder="Nombre Completo" required>
-                        </div>
-                        <div class="mb-3">
-                            <input type="email" class="form-control" name="nuevo_email" placeholder="Correo Electrónico" required>
-                        </div>
-                        <div class="mb-3">
-                            <input type="password" class="form-control" name="nueva_password" placeholder="Contraseña" required>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-success w-100 btn-lg fw-bold mb-3">REGISTRARSE</button>
-                    </form>
-                    
-                    <div class="text-center">
-                        <small class="text-muted">¿Ya tienes cuenta? <a href="#" onclick="mostrarLogin()" class="text-success fw-bold text-decoration-none">Inicia sesión</a></small>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>
@@ -158,6 +170,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/script.js"></script>
+    
+    <script>
+        function mostrarRegistro() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registroForm').style.display = 'block';
+        }
+
+        function mostrarLogin() {
+            document.getElementById('registroForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+    </script>
 </body>
 </html>
